@@ -51,7 +51,12 @@ class Packet:
         #and check if the same
         return checksum_S != computed_checksum_S
 
-    def checkIfACK():
+    def checkIfACKorNAK():
+        #Checks if the message is an ack or nak
+        if self.msg_S == "1" or self.msg_S == "0":
+            return True
+        else:
+            return False
 
 
 
@@ -116,14 +121,32 @@ class RDT:
             #Check if packet is corrupting
             if Packet.corrupt(self.byte_buffer):
                 #Packet is corrupt, send NAK
-                nak = Packet(self.seq_num, "NAK")
+                nak = Packet(self.seq_num, "0")
                 self.network.udt_send(nak.get_byte_S)
 
             else:
                 #Else create packet from buffer content and add to return string
-                p = Packet.from_byte_S(self.byte_buffer[0:length])
+                pack = Packet.from_byte_S(self.byte_buffer[0:length])
 
-                if p.checkIfACK():
+                if p.checkIfACKorNAK():
+                    #If the message is an ack or nak, move on
+                    self.byte_buffer = self.byte_buffer[length:]
+                    continue #Continue to next packets
+
+                #Check if the packet was already received
+                if pack.seq_num < self.seq_num:
+                    #Already received packet, resend correct ACK
+                    ack = Packet(pack.seq_num, "1")
+                    self.network.udt_send(answer.get_byte_S())
+                #Check if new packet received
+                elif pack.seq_num == self.seq_num:
+                    #Send an ACK because new packet received
+                    ack = Packet(self.seq_num, "1")
+                    #Send ack
+                    self.network.udt_send(answer.get_byte_S())
+                    #increment sequence number
+                    self.seq_num += 1
+
                 ret_S = p.msg_S if (ret_S is None) else ret_S + p.msg_S
 
             #remove the packet bytes from the buffer
