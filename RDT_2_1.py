@@ -100,14 +100,12 @@ class RDT:
 
     def rdt_2_1_send(self, msg_S):
         send_pkt = Packet(self.seq_num, msg_S)
-    	#self.seq_num += 1
         print("Current sequence number: " + str(self.seq_num))
 
         while True:
             self.network.udt_send(send_pkt.get_byte_S())    #sends packet
             self.byte_buffer = ''
             receive_pkt = ''
-    	    #self.seq_num += 1
 
             while receive_pkt == '':	#waits for repsonse from receiver
                 receive_pkt = self.network.udt_receive()
