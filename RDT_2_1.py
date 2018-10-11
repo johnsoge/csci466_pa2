@@ -99,7 +99,38 @@ class RDT:
 
 
     def rdt_2_1_send(self, msg_S):
+<<<<<<< HEAD
         pass
+=======
+        p = Packet(self.seq_num, msg_S)
+	send_pkt = p
+	#self.seq_num += 1
+        
+	while True:
+	    self.network.udt_send(send_pkt.get_byte_S())    #sends packet
+	    self.byte_buffer = ''
+	    receive_pkt = ''
+	    #self.seq_num += 1
+
+	while receive_pkt == '':	#waits for repsonse from receiver
+	    receive_pkt = self.network.udt_receive()
+
+	pkt_length = int(rcvpkt[:Packet.length_S_length])	#packet length
+	self.byte_buffer = receive_pkt
+
+	if Packet.corrupt(self.byte_buffer[:pkt_length]):   #checks for corruption in packet
+	    continue
+	else:	#the packet is not corrupt
+	    r = Packet.from_byte_S(self.byte_buffer[:pkt_length])
+	    if r.seq_num < self.seq_num:
+		ACK =  Packet(r.seq_num, '1')
+		self.network.udt.send(ACK.get_byte_S())
+	    if r.msg_S == '1':		#ACK- packet was successfully sent  
+		self.seq += 1
+		break
+	    elif r.msg_S == '0':	#means that NAK is received and you have to resend the packet
+		continue
+>>>>>>> b991bafa653ad7b721a4006e51398d9a7fd9c0d2
 
     def rdt_2_1_receive(self):
         ret_S = None
@@ -180,3 +211,11 @@ if __name__ == '__main__':
         print(rdt.rdt_1_0_receive())
         rdt.rdt_1_0_send('MSG_FROM_SERVER')
         rdt.disconnect()
+<<<<<<< HEAD
+=======
+        
+
+
+        
+        
+>>>>>>> b991bafa653ad7b721a4006e51398d9a7fd9c0d2
