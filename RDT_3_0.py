@@ -104,6 +104,7 @@ class RDT:
         pass
 
     def rdt_3_0_send(self, msg_S):
+	timeout = 5
         send_pkt = Packet(self.seq_num, msg_S)
         print("Current sequence number: " + str(self.seq_num))
 
@@ -111,9 +112,14 @@ class RDT:
             self.network.udt_send(send_pkt.get_byte_S())    #sends packet
             self.byte_buffer = ''
             receive_pkt = ''
+	    start_timeout = time.time()
+	    end_timeout = time.time()
 
-            while receive_pkt == '':	#waits for repsonse from receiver
+            while receive_pkt == '' and end_timeout - start_timeout < timeout:	#waits for repsonse from receiver
                 receive_pkt = self.network.udt_receive()
+		end_timeout = time.time()
+	    if receive_pkt == ''
+		continue
 
             pkt_length = int(receive_pkt[:Packet.length_S_length])	#packet length
             self.byte_buffer = receive_pkt
