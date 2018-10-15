@@ -167,7 +167,7 @@ class RDT:
                     #Already received packet, resend correct ACK
                     print("Sending ACK.")
                     ack = Packet(pack.seq_num, "1")
-                    self.network.udt_send(answer.get_byte_S())
+                    self.network.udt_send(ack.get_byte_S())
                 #Check if new packet received
                 elif pack.seq_num == self.seq_num:
                     #Send an ACK because new packet received

@@ -160,7 +160,7 @@ class RDT:
                 return ret_S #not enough bytes to read the whole packet
 
             #Check if packet is corrupting
-            if Packet.corrupt(self.byte_buffer[:length]):
+            if Packet.corrupt(self.byte_buffer[0:length]):
                 #Packet is corrupt, send NAK
                 print("Sending NAK.")
                 nak = Packet(self.seq_num, "0")
